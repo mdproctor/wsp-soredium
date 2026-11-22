@@ -2,3 +2,7 @@
   issue: 579
   paused: 2026-11-20T15:10:41Z
   epic_active_issue: hortora/soredium#579
+- branch: issue-588-wrap-end-self-resolved-tests
+  issue: 589
+  paused: 2026-11-22T14:36:39Z
+  epic_active_issue: hortora/soredium#589
