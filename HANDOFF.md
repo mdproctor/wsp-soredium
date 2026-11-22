@@ -2,44 +2,32 @@
 
 **Date:** 2026-11-22
 **Where to work:** the permanent clone, `~/claude/hortora/clone/soredium/` (open the session in `wsp-soredium/`). The canonical repo `~/claude/hortora/soredium` is the sync point only.
-**Branch:** `main` in both clone repos (no work branch open)
+**Branch:** `issue-596-move-on-gate` — done on branch, awaiting `work end`
 
 ## What was done
 
-Three issues completed, landed, published, and closed:
+**#596 — work cannot move on until the current item is released** (5 commits)
 
-1. **#588 — Self-resolved context tests** (1 commit)
-   - 10 tests in `tests/test_work_self_resolved.py`
-   - Exercises `fill_from_context()` → `ctx.resolve()` → `topology.resolve(cwd)`
-   - Three layouts: plain workspace, permanent clone, numbered slot
-   - Each includes failed-landing-then-retry
+Separated "carry on" (`work`, `work continue`) from "move on" (`work start`, `work next`). Previously all four aliased to `work.py continue`. Now:
 
-2. **#605 — Silent landing failure detection** (1 commit)
-   - `LandResult.before_sha` captures canonical main before landing
-   - `land_targets()` verifies `already_landed` claims
-   - 4 tests in `tests/test_canonical_sync.py`
+- `work_route.py`: `start`/`next` with an active item return `DECISION=current_item_not_released` with four options (done, deferred, move_down, continue_current)
+- `work.py`: `apply_move_on_gate()` handles the user's choice; dirty-tree check blocks the gate when uncommitted changes exist
+- `plan_manager.py`: new `defer-active` (removes → deferred section) and `move-down` (repositions in queue) commands
+- Handler: `work/handlers/move-on-gate.md`
+- 62 tests across 3 files, all passing
+- Docs updated: work/SKILL.md, maintainer guide, CLAUDE.md
 
-3. **#586 — Context budget recommendations** (5 commits)
-   - `QueueItem.scale`/`.complexity` fields; `(S/Med)` parsed and rendered
-   - `plan_manager.py set-scale` command
-   - Pipeline prints NEXT_ITEM/SCALE/COMPLEXITY with OFFER=wrap_or_continue
-   - `work/SKILL.md`: three-way recommendation table, mid-task monitoring
-   - 10 tests in `tests/test_queue_item_metadata.py`
+## Priority
 
-## Issues filed this session
-
-| # | Title | Scale |
-|---|-------|-------|
-| #612 | plan_manager append populates scale from labels | S |
-| #613 | plan_manager _write_item renders scale explicitly | S |
-| #614 | investigate already_landed false positive | S |
+User requested Hortora/soredium#615 be placed at head of queue.
 
 ## Queue state
 
-- Active: #596 (not started on a branch)
-- 32 open items including the 3 just filed
-- #589 was deactivated (never branched) — still in queue as open
+- #596 is done on `issue-596-move-on-gate`, awaiting close ceremony
+- #615 should be prioritized to head of queue
 
 ## What's next
 
-Run `work start` or `work continue` to begin #596.
+1. Run `work end` to land #596
+2. Reorder queue to put #615 at head
+3. Start #615
