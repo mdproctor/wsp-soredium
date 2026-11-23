@@ -2,28 +2,30 @@
 
 **Date:** 2026-11-23
 **Where to work:** the permanent clone, `~/claude/hortora/clone/soredium/` (open the session in `wsp-soredium/`).
-**Branch:** `issue-590-work-start-create-clone` — done, awaiting close ceremony
+**Branch:** `issue-592-retire-work-chain` (stacked on `issue-627-ci-fork-divergence`, stacked on `issue-590-work-start-create-clone`)
 
 ## What was done
 
-**#590 — Clone guard decision + wrap offer suppression** (done on branch)
+**#627 — CI fork divergence fix** (done on branch `issue-627-ci-fork-divergence`)
 
-Two changes:
+`mirror()` in `canonical_sync.py` now fetches the fork's main before pushing and returns `"diverged"` when the fork has commits canonical doesn't. The misleading "catches up on next publish" warning replaced with an accurate diagnosis naming the fork's specific divergent commits. CI action on engine/eidos/agency gated to only commit on casehubio repos, not forks.
 
-1. **Wrap offer suppression** — `OFFER=wrap_or_continue` now fires only after `work done`, not on `continue`/`start`/`resume`. Done items appear as informational `DONE_WAITING=N`. The `done_items_await_close` stop path replaced with `done_items_informational` (stop=nothing). Fresh sessions are no longer pushed into work end.
+Cross-repo commits: engine, eidos, agency each got `if: github.repository_owner == 'casehubio'` on `generate-api-docs.yml`. These landed on working branches in those repos — HANDOFF updated in casehub workspace.
 
-2. **Clone guard decision flow** — `apply_clone_guard` emits `ACTION=decision` with `DECISION=clone_guard` instead of `ACTION=stop`. New handler file `work/handlers/clone-guard.md` follows the move-on-gate pattern. Two option sets: `create_and_open,stop` (no clone) and `open_clone,stop` (clone exists).
+1 commit on project branch, 3 cross-repo commits.
 
-Code review found 1 fix (stale stops-and-decisions list in lifecycle guide), applied.
+**#592 — Retire work_chain.py and lifecycle.py** (done on branch `issue-592-retire-work-chain`)
 
-4 commits on the project branch, 3 on workspace.
+Deleted both legacy modules (-1,651 lines). Live symbols relocated: `done_fields()` → `ctx.py`, `VALID_STATES` → `plan_io.py`, `is_closed()`/`ClosureState` → `work_health.py`. 37 tests removed, 5 updated. Review caught 4 stale imports outside `project/`/`tests/` (brief.py, two scripts, one handler) — fixed.
+
+4 commits on project branch.
 
 ## What is next
 
-**#591 — Docs catch up with the lifecycle** (next in queue, scale/complexity unknown)
+**#573 — One structure for slots, clones, and agents** — next in queue. Topic change (structural slot/clone architecture).
 
-## References
+## Notes for next session
 
-- Spec: `specs/issue-590-work-start-create-clone/2026-11-23-clone-guard-and-wrap-offer-design.md`
-- Plan: `plans/2026-11-23-clone-guard-and-wrap-offer.md`
-- Blog: `blog/2026-11-23-mdp02-stop-pushing-work-end.md`
+- Engine and eidos forks still need a one-time manual force-push to clear existing divergence (27 and 1 commits respectively). Commands are in the issue body and design spec.
+- The casehub CI fix commits are on working branches in those repos — they need to reach main via work-end in a casehub session to take effect on GitHub.
+- Stale `work_chain.py` reference in `work/SKILL.md` line 54 — cosmetic, not filed as an issue.
