@@ -2,28 +2,28 @@
 
 **Date:** 2026-11-23
 **Where to work:** the permanent clone, `~/claude/hortora/clone/soredium/` (open the session in `wsp-soredium/`).
-**Branch:** `issue-590-work-start-create-clone` — scaffolded, not started
+**Branch:** `issue-590-work-start-create-clone` — done, awaiting close ceremony
 
 ## What was done
 
-**#589 — Read-only survey command** (landed, closed)
+**#590 — Clone guard decision + wrap offer suppression** (done on branch)
 
-Built `project/areas.py` — a read-only command that surveys every area in a family root. Three layers: discover (filesystem walk), inspect (repo state, queues, markers, closures, blog drift, work-end preview), report (14 finding categories).
+Two changes:
 
-Key design decision: three `canonical_sync` functions (`follow`, `ahead_of_canonical`, `reference`) secretly fetch and cannot be used by a read-only tool. Inlined read-only replacements using `rev-parse --verify` and `merge-base`.
+1. **Wrap offer suppression** — `OFFER=wrap_or_continue` now fires only after `work done`, not on `continue`/`start`/`resume`. Done items appear as informational `DONE_WAITING=N`. The `done_items_await_close` stop path replaced with `done_items_informational` (stop=nothing). Fresh sessions are no longer pushed into work end.
 
-Blog drift compares base branches via `git ls-tree`, never disk files — fixing the false-positive problem (32/33 hand-survey gaps were wrong because the project was on a feature branch).
+2. **Clone guard decision flow** — `apply_clone_guard` emits `ACTION=decision` with `DECISION=clone_guard` instead of `ACTION=stop`. New handler file `work/handlers/clone-guard.md` follows the move-on-gate pattern. Two option sets: `create_and_open,stop` (no clone) and `open_clone,stop` (clone exists).
 
-37 tests including read-only guarantee (tree snapshot before/after), idempotency, and false-positive prevention.
+Code review found 1 fix (stale stops-and-decisions list in lifecycle guide), applied.
 
-Code review found and fixed 4 HIGHs: bare-project false gap, YAML list projects field, Path serialization, hardcoded base branch.
+4 commits on the project branch, 3 on workspace.
 
-**#618** filed during brainstorm — structured closure refs in workspace git refs (queued).
+## What is next
 
-**3 follow-up issues filed:** #620 (gate duplicates), #621 (workspace canonical comparison), #622 (format_kv detail).
+**#591 — Docs catch up with the lifecycle** (next in queue, scale/complexity unknown)
 
 ## References
 
-- Spec: `specs/issue-589-read-only-survey-command/2026-11-23-read-only-survey-design.md`
-- Plan: `plans/2026-11-23-read-only-survey.md`
-- Blog: `blog/2026-11-23-mdp01-survey-command.md`
+- Spec: `specs/issue-590-work-start-create-clone/2026-11-23-clone-guard-and-wrap-offer-design.md`
+- Plan: `plans/2026-11-23-clone-guard-and-wrap-offer.md`
+- Blog: `blog/2026-11-23-mdp02-stop-pushing-work-end.md`
