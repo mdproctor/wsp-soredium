@@ -32,3 +32,4 @@
 | [2026-10-14-mdp02-typed-interface-cleanup.md](2026-10-14-mdp02-typed-interface-cleanup.md) | 2026-10-14 | Post-migration cleanup: removing skip_step= fallback, hardening checkout_main against rebase failures, differentiating per-step response schemas |
 | [2026-10-26-mdp01-vacuous-truth-bug.md](2026-10-26-mdp01-vacuous-truth-bug.md) | 2026-10-26 | Vacuous truth bug in corruption detector: empty parse result made all_closed vacuously true |
 | [2026-11-19-mdp01-five-queues-in-one-slot.md](2026-11-19-mdp01-five-queues-in-one-slot.md) | 2026-11-19 | A slot turned out to have five queues; reads that renamed files; a worklog that only recorded starts |
+| [2026-11-23-mdp01-survey-command.md](2026-11-23-mdp01-survey-command.md) | 2026-11-23 | Read-only survey command: comparing base refs instead of disk files, three canonical_sync functions that secretly mutate, and the closure refs gap |
