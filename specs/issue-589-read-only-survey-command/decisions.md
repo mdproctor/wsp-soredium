@@ -94,3 +94,39 @@
 **Sources:** Hortora/soredium#618, work-end/close.py (stamp logic), project/branch_base.py (refs/soredium/base/ pattern)
 **Exploration:** quick
 **Status:** captured
+
+## D9: Work-end preview — in scope
+
+**Choice:** Include a `WorkEndPreview` section in each AreaReport showing what `work end` would attempt: branches that would land, artifacts needing promotion, gates that would refuse.
+**Alternatives:**
+- Defer to follow-up — ship without predictive reporting
+**Rationale:** The issue title explicitly asks for "what work end would do there." The data is derivable from already-collected inspection data (queue done items, branch state, ref state) with no additional git operations.
+**Trade-offs:** Adds complexity to the report. The preview is advisory — gate predictions may differ from actual ceremony results if state changes between survey and execution.
+**Sources:** Issue #589 title, work-end/scope.py, work-end/close.py
+**Exploration:** quick
+**Status:** captured
+
+## D10: Blog unpublished detection — full implementation from refs
+
+**Choice:** Fully implement rule 3 (unpublished = absent from every routing destination). Read frontmatter from git refs via `git show`, resolve routing from blog-routing.yaml, check destination repos via `git ls-tree`.
+**Alternatives:**
+- Defer rule 3 — ship rules 1-2 only
+- Stub — wire routing but report "not yet implemented"
+**Rationale:** The false-positive history (32/33 false gaps) is precisely about incorrect entry enumeration. Doing this right from refs, not disk, is the whole point.
+**Trade-offs:** More complex than promotion gap detection alone. Requires frontmatter parsing from git objects, destination-to-repo resolution, and cross-repo ls-tree.
+**Depends on:** D3 (blog drift included)
+**Sources:** Issue #589 comment rules 1-6, publish-blog/blog_routing.py
+**Exploration:** quick
+**Status:** captured
+
+## D11: Three canonical_sync functions are unsafe — all inlined
+
+**Choice:** `follow()`, `ahead_of_canonical()`, and `reference()` all fetch for clone repos. None are called. Survey inlines read-only replacements for follow and ahead; reference is not needed.
+**Alternatives:**
+- Call them and accept the mutation — violates a-read-never-writes
+- Promote read-only variants to canonical_sync — out of scope for this issue
+**Rationale:** Design review (R1-01, R1-03) confirmed all three mutate. The read-only inlines use rev-parse, merge-base, and rev-list which work via alternates in --shared clones.
+**Trade-offs:** Duplicates logic that could be in canonical_sync. Acceptable — adding read-only variants to canonical_sync is a separate concern.
+**Sources:** canonical_sync.py lines 362, 504, 522 (fetch calls)
+**Exploration:** quick
+**Status:** captured
