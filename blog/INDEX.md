@@ -34,3 +34,4 @@
 | [2026-11-19-mdp01-five-queues-in-one-slot.md](2026-11-19-mdp01-five-queues-in-one-slot.md) | 2026-11-19 | A slot turned out to have five queues; reads that renamed files; a worklog that only recorded starts |
 | [2026-11-23-mdp01-survey-command.md](2026-11-23-mdp01-survey-command.md) | 2026-11-23 | Read-only survey command: comparing base refs instead of disk files, three canonical_sync functions that secretly mutate, and the closure refs gap |
 | [2026-11-23-mdp02-stop-pushing-work-end.md](2026-11-23-mdp02-stop-pushing-work-end.md) | 2026-11-23 | Wrap offer only fires after work done; clone guard becomes a decision flow |
+| [2026-11-23-mdp03-mirror-divergence-and-retirement.md](2026-11-23-mdp03-mirror-divergence-and-retirement.md) | 2026-11-23 | Fixed silent mirror divergence in canonical_sync and retired work_chain.py + lifecycle.py (-1651 lines) |
