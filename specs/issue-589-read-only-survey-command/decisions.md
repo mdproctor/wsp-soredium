@@ -81,3 +81,16 @@
 **Sources:** project/topology.py, project/clone_manager.py, project/slot_io.py
 **Exploration:** quick
 **Status:** captured
+
+## D8: Closure refs awareness — read when present, fall back to stamp parsing
+
+**Choice:** The survey reads `refs/soredium/closed/` and `refs/soredium/closed-meta/<branch>` from workspace repos when present. For branches without closure refs (pre-#618), fall back to parsing stamp commit messages (`chore: branch closed — landed as <SHA>`).
+**Alternatives:**
+- Require closure refs — would miss all existing closed branches
+- Ignore closure refs entirely — misses the opportunity to consume structured data when available
+**Rationale:** #618 will add closure refs to the close ceremony, but the survey ships first. Dual-path reading ensures it works now and improves automatically when #618 lands.
+**Trade-offs:** Two code paths for reading closure status. The stamp-parsing path becomes dead code once all branches have refs, but that's a long tail.
+**Depends on:** D5 (filesystem walk discovers areas), D6 (inspect layer reads refs)
+**Sources:** Hortora/soredium#618, work-end/close.py (stamp logic), project/branch_base.py (refs/soredium/base/ pattern)
+**Exploration:** quick
+**Status:** captured
