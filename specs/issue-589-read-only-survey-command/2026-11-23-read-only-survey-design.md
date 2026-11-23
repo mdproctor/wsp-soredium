@@ -77,7 +77,7 @@ functions.
 | Dirty file count | `git status --porcelain` line count |
 | Remotes | `git remote` |
 | Ahead-of-canonical | `canonical_sync.ahead_of_canonical()` |
-| Follow state | `canonical_sync.follow()` (clone/slot only) |
+| Follow state | Inline SHA comparison (see below) |
 | In-progress operation | `canonical_sync._in_progress()` |
 | Worktrees | `canonical_sync._worktrees()` |
 
@@ -91,6 +91,27 @@ functions.
 | Queue status | Each candidate's `status` |
 | Root queue marker | `queue_home.uses_root()` |
 
+**Follow state (read-only inline):**
+
+`canonical_sync.follow()` is NOT safe for the survey — it fetches and
+fast-forwards. The survey inlines the read-only comparison:
+
+```python
+def follow_state_readonly(clone_repo: Path, canon_repo: Path, base: str) -> str:
+    clone_sha = git(clone_repo, "rev-parse", f"refs/heads/{base}").stdout.strip()
+    canon_sha = git(canon_repo, "rev-parse", f"refs/heads/{base}").stdout.strip()
+    if clone_sha == canon_sha:
+        return "current"
+    merge_base = git(clone_repo, "merge-base", clone_sha, canon_sha).stdout.strip()
+    if merge_base == clone_sha:
+        return "fast-forward"   # clone is behind canonical
+    if merge_base == canon_sha:
+        return "ahead"          # clone has commits canonical lacks
+    return "diverged"           # both have unique commits
+```
+
+No fetch, no merge, no mutation. Uses `git_util.git()` which never raises.
+
 **Markers** (via `Path.exists()`):
 
 `.slot`, `.permanent`, `.queue-root`, `.clone-enabled`, `.landed`,
@@ -102,16 +123,31 @@ functions.
 
 **Blog/artifact drift** (areas with `blog-routing.yaml`):
 
+**IMPORTANT:** `blog_routing.plan()` reads the working tree (`.glob()`,
+`.read_bytes()`), which produces false positives when the checkout is on
+a feature branch older than a promotion. The survey enumerates entries
+from `git ls-tree` on base refs, not from disk. `blog_routing.plan()`
+is used only for routing resolution (which destinations an entry maps
+to), after the entry list is determined from refs.
+
+```python
+def entries_on_base(repo: Path, base: str, blog_dir: str = "docs/blog") -> set[str]:
+    result = git(repo, "ls-tree", "-r", "--name-only", base, "--", blog_dir)
+    return {line for line in result.stdout.strip().splitlines() if line}
+```
+
 Rules from #589 comment:
 
 1. **Promotion gap** = entry present on workspace **base branch** (`git
    ls-tree -r <base> -- docs/blog/`) AND absent from project **base
    branch** (`git ls-tree -r <base> -- docs/blog/`). Never compare files
    on disk — always base refs.
-2. **Waiting for landing** = entry only on a workspace working branch.
-   Reported separately, not counted as a gap.
+2. **Waiting for landing** = entry only on a workspace working branch
+   (present on HEAD but not on base). Reported separately, not a gap.
 3. **Unpublished** = absent from every destination the routing plan names.
-   Determined by `blog_routing.plan()`, not inferred from frontmatter.
+   Determined by `blog_routing.plan()` for routing resolution, but entry
+   presence at destinations checked via `git ls-tree` on the destination
+   repo's base branch.
 4. **Idempotent** = consecutive runs with no changes between produce
    identical numbers. Tested.
 
@@ -137,18 +173,18 @@ per-area findings into a summary attention list.
 
 | Condition | Severity | Category |
 |-----------|----------|----------|
-| Clone diverged from canonical | error | `drift` |
-| Rebase/merge/cherry-pick in progress | error | `stuck-operation` |
-| Queue names a branch not checked out | warning | `queue-mismatch` |
-| Multiple queues, no `.queue-root` | warning | `queue-ambiguity` |
-| Stale `.close-state` file | warning | `stale-state` |
-| Dirty working tree on base branch | warning | `dirty-base` |
-| Blog promotion gap (base ref comparison) | warning | `promotion-gap` |
-| Unstamped branch (closed but no stamp) | warning | `unstamped-branch` |
-| Unpublished entries (routing plan) | info | `unpublished` |
-| Ahead of canonical (normal during work) | info | `ahead` |
-| Legacy layout detected | info | `legacy-layout` |
-| Landed but not archived slot | info | `landed-not-archived` |
+| Clone diverged from canonical | ERROR | `drift` |
+| Rebase/merge/cherry-pick in progress | ERROR | `stuck-operation` |
+| Queue names a branch not checked out | WARN | `queue-mismatch` |
+| Multiple queues, no `.queue-root` | WARN | `queue-ambiguity` |
+| Stale `.close-state` file | WARN | `stale-state` |
+| Dirty working tree on base branch | WARN | `dirty-base` |
+| Blog promotion gap (base ref comparison) | WARN | `promotion-gap` |
+| Unstamped branch (closed but no stamp) | WARN | `unstamped-branch` |
+| Unpublished entries (routing plan) | INFO | `unpublished` |
+| Ahead of canonical (normal during work) | INFO | `ahead` |
+| Legacy layout detected | INFO | `legacy-layout` |
+| Landed but not archived slot | INFO | `landed-not-archived` |
 
 Findings use `verification.Finding(severity, category, message)`.
 
@@ -332,14 +368,16 @@ Imports from existing modules (all read-only usage):
 
 - `project.git_util` — `git()`, `collect_slot_repos()`
 - `project.canonical_sync` — `locate()`, `reference()`,
-  `ahead_of_canonical()`, `follow()`, `_in_progress()`, `_worktrees()`
+  `ahead_of_canonical()`, `_in_progress()`, `_worktrees()`
+  (**NOT `follow()`** — it mutates; inlined as `follow_state_readonly`)
 - `project.queue_home` — `candidates()`, `uses_root()`
 - `project.queue_io` — `queue_dir()`, `read_queue()`
 - `project.slot_io` — `parse_slot()`
 - `project.clone_manager` — `is_permanent()`, `is_enabled()`
 - `project.branch_base` — `parent_of()`, `base_of()`
-- `publish-blog.blog_routing` — `plan()`
-- `verification` — `Finding`
+- `publish-blog.blog_routing` — `plan()` (**routing resolution only**;
+  entry enumeration via `git ls-tree`, not `plan()`'s glob)
+- `verification` — `Finding` (severities: ERROR, WARN, INFO)
 
 ## Protocol Compliance
 
