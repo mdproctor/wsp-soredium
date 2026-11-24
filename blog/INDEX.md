@@ -36,3 +36,4 @@
 | [2026-11-23-mdp02-stop-pushing-work-end.md](2026-11-23-mdp02-stop-pushing-work-end.md) | 2026-11-23 | Wrap offer only fires after work done; clone guard becomes a decision flow |
 | [2026-11-23-mdp03-mirror-divergence-and-retirement.md](2026-11-23-mdp03-mirror-divergence-and-retirement.md) | 2026-11-23 | Fixed silent mirror divergence in canonical_sync and retired work_chain.py + lifecycle.py (-1651 lines) |
 | [2026-11-24-mdp01-ceremony-stops-failing.md](2026-11-24-mdp01-ceremony-stops-failing.md) | 2026-11-24 | Why work end failed twice per ceremony and how pulling prerequisite checks into their own pipeline steps fixed it |
+| [2026-11-24-mdp02-branch-exists-not-a-crash.md](2026-11-24-mdp02-branch-exists-not-a-crash.md) | 2026-11-24 | Guards base-branch names and resumes known branches in cut() instead of crashing with raw git errors |
