@@ -1,6 +1,6 @@
 _run=end
 review_attempt=1
-last_yielded=item_finished
+last_yielded=handoff
 review=done
 review_produced=0
 diary_attempt=1
@@ -24,3 +24,16 @@ promote=done
 _exec_ok:squash_review=yes
 report_squash_review=ok
 squash_review=done
+_exec_ok:land=yes
+report_land=LANDED=hortora/soredium#599; CLOSED_ITEM=hortora/soredium#599 branch=issue-599-work-end-step-promotion; CARRIED=wsp-soredium:issue-599-work-end-step-promotion commits=6; UNPUBLISHED=/Users/mdproctor/claude/public/soredium commits=7
+land=done
+_exec_ok:promote_backlog=yes
+report_promote_backlog=PROMOTED_COUNT=0
+promote_backlog=done
+_exec_ok:publish=yes
+report_publish=PUBLISHED_COUNT=2
+publish=done
+_exec_ok:publish_blog=yes
+report_publish_blog=BLOG_PUBLISHED_COUNT=2
+publish_blog=done
+handoff_attempt=1
