@@ -2,35 +2,33 @@
 
 **Date:** 2026-11-24
 **Where to work:** the permanent clone, `~/claude/hortora/clone/soredium/` (open the session in `wsp-soredium/`).
-**Branch:** `issue-599-work-end-step-promotion` — landed, published, closed
+**Branch:** `issue-600-work-start-branch-exists` — done, ready to land
 
 ## What was done (this session)
 
-**#632 — Stale workspace branch alignment repair:**
-- `project_behind` is now repairable when the workspace branch is stale (not in queue)
-- Queue gate in `apply_alignment()`: only repairs when branch is not the queue's active branch
-- 4 tests in `test_alignment_repair.py`, 2 tests in `test_work_alignment_gate.py`
+**#600 — work start branch already exists failures:**
+- `branch_base.cut()` now guards against `branch == base_branch` and `branch == "HEAD"` with structured `refused:` error
+- Known branches (with `refs/soredium/base/<branch>`) are resumed via `git checkout` instead of failing — returns `resumed:<parent>`
+- Unknown existing branches get structured `branch_exists:` error instead of raw git message
+- `create_branches_typed()` rollback adjusted: pre-existing branches are not deleted on workspace failure
+- `CreateResult.resumed` field tracks whether any primary repo branch was resumed (scoped to project + workspace, not slot siblings)
+- `branch-name.md` handler updated to reflect new behavior
+- 13 tests: `TestCutGuards` (5), CLI (4), `TestSlotResumePartial` (2), API (2)
 
-**#599 — work end runs promotion and squash review as steps:**
-- `promote` and `squash_review` mechanical steps added to `_CLOSE_STEPS` before `land`
-- New `scope.py promote` and `scope.py squash-review` commands
-- Steps use `done_items()` and `batch_entries()` for correct branch/covers resolution after `mark_done`
-- `sequence_preflight()` extended with `PREFLIGHT_WARN=` reporting all blockers before judgment steps
-- `item_finished` skip_fn guard: reuses saved answer on retry, prints `ITEM_FINISHED_REUSED=<answer>`
-- `land()` exit_1 fix: DETAIL is never empty
-- Lifecycle maintainer guide updated
-- Design spec and diary entry promoted
+**SVG mandate for diary/blog entries:**
+- `diary.md` — "Include diagrams" changed to mandatory gate with diagram-type menu
+- `wrap-diary.md` — diagram gate: entry must reference at least one `.svg` on disk before completion
+- `diary-visual-elements.md` — SVG generation promoted to primary visual element with creation guide
+- `mandatory-rules.md` — "consider" changed to "every diary entry includes at least one SVG"
 
-**#634 filed:** Investigate how workspace and project branches diverge (the root cause behind #632's safety net)
-
-**Deferred:** Worklog audit of two specific runs (data aged out of trace; root cause fixed by the guard)
+**#636 filed:** `create_slot()` never sets up `.queue-root` — slot workspaces use inherited queue instead of root queue, causing rebase conflicts on `.queue` and `.work-progress`
 
 ## What is next
 
-Next open queue item. The pipeline restructure is done — #599 and #632 are landed.
+Land #600. Then #636 (slot queue-root gap) is queued and ready — the fix is `queue_home.adopt(slot_dir, apply=True)` added to `create_slot()`.
 
 ## Notes for next session
 
-- The pipeline now stops at `promote` or `squash_review` before reaching `land` — no more double-retry pattern
-- `sync-local` was run mid-session to install the new code for the ceremony to use
+- The SVG mandate commit rides on the #600 branch but is a separate concern — may want to split it at squash time
 - Engine and eidos forks still need a one-time manual force-push (from #627)
+- `sync-local` was run to install the updated skills
