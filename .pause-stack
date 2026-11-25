@@ -6,3 +6,7 @@
   issue: 589
   paused: 2026-11-22T14:36:39Z
   epic_active_issue: hortora/soredium#589
+- branch: main
+  issue: 606
+  paused: 2026-11-25T00:29:30Z
+  epic_active_issue: hortora/soredium#606
