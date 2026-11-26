@@ -2,33 +2,37 @@
 
 **Date:** 2026-11-26
 **Where to work:** the permanent clone, `~/claude/hortora/clone/soredium/` (open the session in `wsp-soredium/`).
-**Branch:** `issue-618-structured-closure-refs` — done, landed
+**Branch:** `issue-630-fix-work-done` (stacked on `issue-625-post-landing-verify` on `issue-624-landing-gates` on `issue-618-structured-closure-refs`)
 
 ## What was done (this session)
 
-**#606 — canonical_sync.locate rejects URL local remotes:**
-- `locate()` now detects network URLs (`://`, `git@host:`) in the `local` remote and raises `local_is_url` with redacted credentials
-- Relative paths resolved from repo directory, not Python CWD
-- 4 new tests: HTTPS URL, SSH URL, credentials, relative path
+**#623 — plan_manager scale/complexity from GitHub labels (on main as df5f6ec):**
+- `QueueItem` gains `scale`/`complexity` fields, parsed via `_SCALE_MARKER_RE`
+- `_write_item` renders `(S/Med)` inline; `_fetch_issue_scale` queries labels on append
+- 12 new tests
 
-**#610 — Untrack pipeline state files:**
-- `.work-progress`, `.wrap-log.jsonl`, `.land-ledger.jsonl`, `.workspace` untracked from workspace repos via `git rm --cached`
-- `ctx.py` no longer writes `.workspace` marker on read — reports `marker_stale` instead (protocol violation fixed)
-- `_EXCLUDE_ENTRIES` in `slot_git.py` ensures new clones/slots get exclude entries
-- `.workspace` added to `_LIFECYCLE_IGNORE` in close.py
-- 7 new tests across 3 files
+**#624 — Landing gates: divergence check, stage invariant, settlement error:**
+- Preflight now checks `canonical_sync.follow()` per target — diverged clone blocks ceremony
+- Stage invariant: every target must have a non-empty SHA before stamping
+- `SettlementError` replaces silent warnings in `settle_permanent_clone`
+- 8 new tests; existing diverged test updated to expect failure
 
-**#618 — Structured closure refs:**
-- New module `project/closure_refs.py`: `record()`, `read()`, `list_closed()`, `clear()`
-- `close.py` writes closure refs after each ceremony
-- `refs/soredium/closed/<branch>` (landed SHA), `refs/soredium/closed-meta/<branch>` (structured blob)
-- 11 new tests (9 unit + 2 integration)
+**#625 — Post-landing verification and stamp reconciliation:**
+- `verify_landing_advanced`: confirms main advanced, checks linear history
+- `reconcile_stamps`: verifies closure ref SHAs still reachable from main
+- 9 new tests
+
+**#630 — Fix mark_done double-call bug:**
+- Guard: refuses when active item has no branch in state (never started)
+- Prevents pipeline retry from marking the next item done on the previous branch
+- 1 regression test
 
 ## What is next
 
-#623 — plan_manager populate and render scale from labels
+4 done items (#623, #624, #625, #630) are about to be landed by work end.
+Next queue item: #634.
 
 ## Notes for next session
 
 - Engine and eidos forks still need a one-time manual force-push (from #627)
-- Three done items landed this session: #606, #610, #618
+- Pre-existing test failures in `test_close_integration.py` (TestSlotPromotionGate, TestSquashReviewGate) and `test_close_batch.py` (TestNothingLandsWhenTheBatchIsNotReady) — not caused by this session's changes
