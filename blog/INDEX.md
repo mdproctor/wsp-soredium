@@ -38,3 +38,4 @@
 | [2026-11-24-mdp01-ceremony-stops-failing.md](2026-11-24-mdp01-ceremony-stops-failing.md) | 2026-11-24 | Why work end failed twice per ceremony and how pulling prerequisite checks into their own pipeline steps fixed it |
 | [2026-11-24-mdp02-branch-exists-not-a-crash.md](2026-11-24-mdp02-branch-exists-not-a-crash.md) | 2026-11-24 | Guards base-branch names and resumes known branches in cut() instead of crashing with raw git errors |
 | [2026-11-26-mdp01-three-guards-and-a-ref.md](2026-11-26-mdp01-three-guards-and-a-ref.md) | 2026-11-26 | URL guards in locate(), untracked pipeline state files, structured closure refs in workspace git refs |
+| [2026-11-26-mdp02-ceremony-hardening.md](2026-11-26-mdp02-ceremony-hardening.md) | 2026-11-26 | Hardening the close ceremony with divergence, advancement, and stamp reconciliation gates |
