@@ -1,34 +1,34 @@
 # Session Handover
 
-**Date:** 2026-11-24
+**Date:** 2026-11-26
 **Where to work:** the permanent clone, `~/claude/hortora/clone/soredium/` (open the session in `wsp-soredium/`).
-**Branch:** `issue-600-work-start-branch-exists` — done, ready to land
+**Branch:** `issue-618-structured-closure-refs` — done, landed
 
 ## What was done (this session)
 
-**#600 — work start branch already exists failures:**
-- `branch_base.cut()` now guards against `branch == base_branch` and `branch == "HEAD"` with structured `refused:` error
-- Known branches (with `refs/soredium/base/<branch>`) are resumed via `git checkout` instead of failing — returns `resumed:<parent>`
-- Unknown existing branches get structured `branch_exists:` error instead of raw git message
-- `create_branches_typed()` rollback adjusted: pre-existing branches are not deleted on workspace failure
-- `CreateResult.resumed` field tracks whether any primary repo branch was resumed (scoped to project + workspace, not slot siblings)
-- `branch-name.md` handler updated to reflect new behavior
-- 13 tests: `TestCutGuards` (5), CLI (4), `TestSlotResumePartial` (2), API (2)
+**#606 — canonical_sync.locate rejects URL local remotes:**
+- `locate()` now detects network URLs (`://`, `git@host:`) in the `local` remote and raises `local_is_url` with redacted credentials
+- Relative paths resolved from repo directory, not Python CWD
+- 4 new tests: HTTPS URL, SSH URL, credentials, relative path
 
-**SVG mandate for diary/blog entries:**
-- `diary.md` — "Include diagrams" changed to mandatory gate with diagram-type menu
-- `wrap-diary.md` — diagram gate: entry must reference at least one `.svg` on disk before completion
-- `diary-visual-elements.md` — SVG generation promoted to primary visual element with creation guide
-- `mandatory-rules.md` — "consider" changed to "every diary entry includes at least one SVG"
+**#610 — Untrack pipeline state files:**
+- `.work-progress`, `.wrap-log.jsonl`, `.land-ledger.jsonl`, `.workspace` untracked from workspace repos via `git rm --cached`
+- `ctx.py` no longer writes `.workspace` marker on read — reports `marker_stale` instead (protocol violation fixed)
+- `_EXCLUDE_ENTRIES` in `slot_git.py` ensures new clones/slots get exclude entries
+- `.workspace` added to `_LIFECYCLE_IGNORE` in close.py
+- 7 new tests across 3 files
 
-**#636 filed:** `create_slot()` never sets up `.queue-root` — slot workspaces use inherited queue instead of root queue, causing rebase conflicts on `.queue` and `.work-progress`
+**#618 — Structured closure refs:**
+- New module `project/closure_refs.py`: `record()`, `read()`, `list_closed()`, `clear()`
+- `close.py` writes closure refs after each ceremony
+- `refs/soredium/closed/<branch>` (landed SHA), `refs/soredium/closed-meta/<branch>` (structured blob)
+- 11 new tests (9 unit + 2 integration)
 
 ## What is next
 
-Land #600. Then #636 (slot queue-root gap) is queued and ready — the fix is `queue_home.adopt(slot_dir, apply=True)` added to `create_slot()`.
+#623 — plan_manager populate and render scale from labels
 
 ## Notes for next session
 
-- The SVG mandate commit rides on the #600 branch but is a separate concern — may want to split it at squash time
 - Engine and eidos forks still need a one-time manual force-push (from #627)
-- `sync-local` was run to install the updated skills
+- Three done items landed this session: #606, #610, #618
